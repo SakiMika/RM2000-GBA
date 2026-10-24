@@ -1,0 +1,54 @@
+name: Build GBA ROM
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test GBA
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install ARM-capable LLVM tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang lld llvm build-essential
+          python -m pip install -r requirements.txt
+
+      - name: Build ROM
+        shell: bash
+        run: |
+          set -o pipefail
+          bash build.sh 2>&1 | tee buildlog.txt
+
+      - name: Run project checks
+        shell: bash
+        run: |
+          set -o pipefail
+          python tools/test.py 2>&1 | tee testlog.txt
+          sha256sum build/sample.gba | tee -a testlog.txt
+
+      - name: Upload ROM and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: RM2K-GBA
+          if-no-files-found: warn
+          path: |
+            build/sample.gba
+            build/sample.map
+            buildlog.txt
+            testlog.txt

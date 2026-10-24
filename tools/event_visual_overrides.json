@@ -1,0 +1,15 @@
+{
+  "description": "Explicit native-only graphic overrides. The original LCF event is invisible; it has no character_name. These overrides do not alter its event commands or triggers.",
+  "overrides": [
+    {
+      "map_id": 1,
+      "event_id": 1,
+      "source": "ChipSet/Outline.png",
+      "tile_col": 19,
+      "tile_row": 8,
+      "width": 16,
+      "height": 16,
+      "note": "Tree stump from the original chipset (not assigned by original LMU)."
+    }
+  ]
+}
